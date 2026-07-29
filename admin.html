@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Resultado da validação · MediaGrowth</title>
+<meta name="robots" content="noindex,nofollow">
+<style>
+  *{box-sizing:border-box}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:#0f1420;color:#e7ebf5;margin:0;padding:24px 16px 80px;line-height:1.5}
+  .wrap{max-width:820px;margin:0 auto}
+  h1{font-size:20px;margin:0 0 2px}
+  .sub{color:#8b93a7;font-size:13px;margin-bottom:18px}
+  .who{color:#8b93a7;font-size:13px;margin-bottom:18px}
+  .cards{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+  .card{flex:1;min-width:120px;background:#182031;border:1px solid #26304a;border-radius:12px;padding:14px}
+  .card .num{font-size:26px;font-weight:800}
+  .card .lbl{font-size:12px;color:#8b93a7;margin-top:2px}
+  .card.ap .num{color:#4ade80}.card.re .num{color:#f87171}.card.su .num{color:#7aa2ff}
+  section{background:#151c2b;border:1px solid #26304a;border-radius:12px;padding:16px;margin:14px 0}
+  section h2{font-size:15px;margin:0 0 10px;display:flex;align-items:center;gap:8px}
+  .btn{background:#2540c8;color:#fff;border:none;border-radius:9px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer}
+  .btn:hover{background:#3a5cf0}
+  .btn.ghost{background:transparent;border:1px solid #33406a;color:#c7d0e6}
+  textarea{width:100%;background:#0f1420;border:1px solid #26304a;color:#e7ebf5;border-radius:9px;padding:10px;font-family:ui-monospace,Menlo,monospace;font-size:12.5px;min-height:120px;resize:vertical}
+  ul{margin:8px 0 0;padding-left:18px}
+  li{margin:5px 0;font-size:14px}
+  li .note{color:#9aa3b8;font-style:italic;font-size:12.5px}
+  .tag{font-size:11px;color:#8b93a7}
+  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+  input.slug{background:#0f1420;border:1px solid #26304a;color:#e7ebf5;border-radius:9px;padding:8px 10px;font-size:13px}
+  .empty{color:#8b93a7;font-size:13px}
+  a{color:#7aa2ff}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1 id="h">Resultado da validação</h1>
+  <div class="sub" id="sub">carregando...</div>
+  <div class="row">
+    <input class="slug" id="slug" placeholder="slug do cliente">
+    <button class="btn ghost" id="reload">Recarregar</button>
+    <a id="pagelink" class="btn ghost" style="text-decoration:none" target="_blank">Abrir página do cliente ↗</a>
+  </div>
+  <div class="who" id="who"></div>
+
+  <div class="cards">
+    <div class="card ap"><div class="num" id="c-ap">0</div><div class="lbl">aprovadas</div></div>
+    <div class="card re"><div class="num" id="c-re">0</div><div class="lbl">reprovadas</div></div>
+    <div class="card su"><div class="num" id="c-su">0</div><div class="lbl">sugeridas</div></div>
+    <div class="card"><div class="num" id="c-pe">0</div><div class="lbl">pendentes</div></div>
+  </div>
+
+  <section>
+    <h2>✓ Aprovadas <button class="btn" id="copy-ap" style="margin-left:auto">Copiar lista</button></h2>
+    <textarea id="ta-ap" readonly></textarea>
+  </section>
+
+  <section>
+    <h2>✕ Reprovadas (com motivo)</h2>
+    <ul id="list-re"></ul>
+    <div class="empty" id="empty-re" style="display:none">Nenhuma reprovada.</div>
+  </section>
+
+  <section>
+    <h2>💡 Sugeridas pelo cliente</h2>
+    <ul id="list-su"></ul>
+    <div class="empty" id="empty-su" style="display:none">Nenhuma sugestão.</div>
+  </section>
+
+  <section>
+    <h2>📝 Observações nas aprovadas</h2>
+    <ul id="list-notes"></ul>
+    <div class="empty" id="empty-notes" style="display:none">Sem observações.</div>
+  </section>
+</div>
+
+<script src="config.js"></script>
+<script>
+(function(){
+  var API=(window.KW_CONFIG&&window.KW_CONFIG.apiBase)||"";
+  var params=new URLSearchParams(location.search);
+  var SLUG=(params.get("c")||params.get("slug")||"magicis").toLowerCase().replace(/[^a-z0-9\-]/g,"");
+  var $=function(id){return document.getElementById(id)};
+  function esc(s){return String(s==null?"":s).replace(/[&<>]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;"}[c]})}
+
+  function load(){
+    $("slug").value=SLUG;
+    $("pagelink").href="index.html?c="+encodeURIComponent(SLUG);
+    Promise.all([
+      fetch("clients/"+SLUG+".json",{cache:"no-store"}).then(function(r){return r.ok?r.json():null}).catch(function(){return null}),
+      fetch(API+"?action=get&slug="+encodeURIComponent(SLUG),{cache:"no-store"}).then(function(r){return r.json()}).catch(function(){return null})
+    ]).then(function(res){
+      var seed=res[0], st=res[1]||{decisions:{},suggestions:[],reviewer:""};
+      var dec=st.decisions||{}, sug=st.suggestions||[];
+      $("h").textContent=(seed&&seed.client?seed.client+" · ":"")+"Resultado da validação";
+      $("sub").textContent="slug: "+SLUG;
+      $("who").textContent=st.reviewer?("Avaliado por: "+st.reviewer):"Ainda sem nome de quem avaliou.";
+
+      var allKw=[]; if(seed&&seed.categories){seed.categories.forEach(function(c){c.keywords.forEach(function(k){allKw.push(k)})})}
+      // se nao houver seed, usa as chaves que vieram das decisoes
+      if(!allKw.length){allKw=Object.keys(dec)}
+
+      var ap=[],re=[],notes=[],pe=0;
+      allKw.forEach(function(k){
+        var d=dec[k];
+        if(d&&d.status==="approved"){ap.push(k); if(d.note&&d.note.trim())notes.push({k:k,note:d.note});}
+        else if(d&&d.status==="rejected"){re.push({k:k,note:d.note||""});}
+        else pe++;
+      });
+
+      $("c-ap").textContent=ap.length;$("c-re").textContent=re.length;
+      $("c-su").textContent=sug.length;$("c-pe").textContent=pe;
+      $("ta-ap").value=ap.join("\n");
+
+      $("list-re").innerHTML=re.map(function(x){return "<li>"+esc(x.k)+(x.note?' <span class="note">— '+esc(x.note)+'</span>':'')+"</li>"}).join("");
+      $("empty-re").style.display=re.length?"none":"block";
+
+      $("list-su").innerHTML=sug.map(function(s){return "<li>"+esc(s.text)+(s.note?' <span class="note">— '+esc(s.note)+'</span>':'')+' <span class="tag">('+esc(s.by||"cliente")+')</span></li>'}).join("");
+      $("empty-su").style.display=sug.length?"none":"block";
+
+      $("list-notes").innerHTML=notes.map(function(x){return "<li><b>"+esc(x.k)+'</b> <span class="note">— '+esc(x.note)+'</span></li>'}).join("");
+      $("empty-notes").style.display=notes.length?"none":"block";
+    });
+  }
+  $("reload").addEventListener("click",function(){var v=$("slug").value.trim().toLowerCase().replace(/[^a-z0-9\-]/g,"");location.search="?c="+v});
+  $("slug").addEventListener("keydown",function(e){if(e.key==="Enter")$("reload").click()});
+  $("copy-ap").addEventListener("click",function(){$("ta-ap").select();document.execCommand("copy");this.textContent="Copiado!";var b=this;setTimeout(function(){b.textContent="Copiar lista"},1500)});
+  load();
+})();
+</script>
+</body>
+</html>

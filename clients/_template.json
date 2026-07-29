@@ -1,0 +1,31 @@
+{
+  "slug": "nome-do-cliente",
+  "client": "NOME DO CLIENTE",
+  "title": "Validação de Palavras-chave",
+  "subtitle": "Estratégia de SEO",
+  "lang": "pt",
+  "brand": {
+    "primary": "#3a5cf0",
+    "primaryDark": "#2540c8",
+    "logo": "logos/nome-do-cliente.png"
+  },
+  "intro": "Texto curto explicando ao cliente o que ele deve fazer nesta página.",
+  "categories": [
+    {
+      "name": "Nome da categoria",
+      "hint": "Explicação curta e opcional da categoria.",
+      "keywords": [
+        "palavra chave 1",
+        "palavra chave 2"
+      ]
+    },
+    {
+      "name": "Categoria só para monitorar",
+      "hint": "Aparece com destaque de aviso.",
+      "monitor": true,
+      "keywords": [
+        "termo sensível 1"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Validação de Palavras-chave</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="hero-top">
+      <img id="logo" class="hero-logo" alt="" style="display:none">
+      <div>
+        <div class="client" id="client"></div>
+        <h1 id="title">Validação de Palavras-chave</h1>
+        <div class="sub" id="subtitle"></div>
+      </div>
+    </div>
+    <p class="intro" id="intro"></p>
+  </div>
+</header>
+
+<div class="bar">
+  <div class="bar-in">
+    <div class="progress">
+      <div class="track"><div class="fa" id="pa" style="width:0"></div><div class="fr" id="pr" style="width:0"></div></div>
+      <div class="labels">
+        <span><b id="n-done">0</b>/<b id="n-total">0</b> avaliadas</span>
+        <span><span class="dot a"></span><b id="n-ap">0</b> aprovadas</span>
+        <span><span class="dot r"></span><b id="n-re">0</b> reprovadas</span>
+        <span><span class="dot p"></span><b id="n-pe">0</b> pendentes</span>
+      </div>
+    </div>
+    <div class="saved" id="saved">&nbsp;</div>
+  </div>
+</div>
+
+<main class="wrap">
+
+  <div class="who">
+    <label for="reviewer">Quem está avaliando?</label>
+    <input id="reviewer" type="text" placeholder="Seu nome" autocomplete="name">
+  </div>
+
+  <div class="controls">
+    <div class="search"><input id="q" type="text" placeholder="Buscar palavra-chave..."></div>
+    <div class="chips" id="chips">
+      <span class="chip on" data-f="all">Todas</span>
+      <span class="chip" data-f="pending">Pendentes</span>
+      <span class="chip" data-f="approved">Aprovadas</span>
+      <span class="chip" data-f="rejected">Reprovadas</span>
+      <span class="chip" data-f="noted">Com observação</span>
+    </div>
+  </div>
+
+  <div id="cats">
+    <div class="loading"><div class="spin"></div>Carregando palavras-chave...</div>
+  </div>
+
+  <section class="sug">
+    <h3>Falta alguma palavra?</h3>
+    <p>Se você lembra de algum termo que seus clientes usam e não está na lista, adicione aqui.</p>
+    <div class="sug-form">
+      <input id="sug-text" type="text" placeholder="Ex.: bingo hall software">
+      <input id="sug-note" type="text" placeholder="Observação (opcional)" style="flex:2">
+      <button id="sug-add">Adicionar</button>
+    </div>
+    <div class="sug-list" id="sug-list"></div>
+  </section>
+
+  <section class="summary">
+    <h3>Resumo da sua validação</h3>
+    <div class="row">
+      <div class="box"><div class="num" id="s-ap">0</div><div class="lbl">aprovadas</div></div>
+      <div class="box"><div class="num" id="s-re">0</div><div class="lbl">reprovadas</div></div>
+      <div class="box"><div class="num" id="s-su">0</div><div class="lbl">sugeridas por você</div></div>
+      <div class="box"><div class="num" id="s-pe">0</div><div class="lbl">ainda pendentes</div></div>
+    </div>
+    <div class="done" id="s-done">Vai salvando sozinho conforme você marca. Pode fechar e voltar depois.</div>
+  </section>
+
+  <div class="foot">Feito pela MediaGrowth · sua resposta é salva automaticamente</div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
